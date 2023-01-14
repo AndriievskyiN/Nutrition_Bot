@@ -5,8 +5,8 @@ class Keyboard:
         pass
 
     @staticmethod
-    def meal_id_keyboard():
-        buttons = [InlineKeyboardButton(text=f"Meal{i+1}", callback_data=f"meal_{i+1}") for i in range(4)]
+    def meal_id_keyboard(n_buttons=4):
+        buttons = [InlineKeyboardButton(text=f"Meal {i+1}", callback_data=f"meal_{i}") for i in range(n_buttons)]
         keyboard = InlineKeyboardMarkup().add(*buttons)
         return keyboard
 
