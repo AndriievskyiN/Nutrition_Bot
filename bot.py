@@ -29,11 +29,11 @@ async def add_meal(message: types.Message):
     await MealHandler.meal_id.set()
 
 
-@dp.callback_query_handler(text=[f"meal_{i}" for i in range(4)], state=MealHandler.meal_id)
+@dp.callback_query_handler(text=[i for i in range(4)], state=MealHandler.meal_id)
 async def get_meal_id(call: types.CallbackQuery, state: FSMContext):
     await call.message.delete()
 
-    meal_id = call.data
+    meal_id = int(call.data)
     await state.update_data(
         {"meal_id": meal_id}
     )
@@ -43,7 +43,7 @@ async def get_meal_id(call: types.CallbackQuery, state: FSMContext):
 
 @dp.message_handler(state=MealHandler.calories)
 async def get_calories(message: types.Message, state: FSMContext):
-    calories = message.text
+    calories = float(message.text)
     await state.update_data(
        {"calories": calories}
     )
@@ -53,7 +53,7 @@ async def get_calories(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=MealHandler.carbs)
 async def get_carbs(message: types.Message, state: FSMContext):
-    carbs = message.text
+    carbs = float(message.text)
     await state.update_data(
        {"carbs": carbs}
     )
@@ -63,7 +63,7 @@ async def get_carbs(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=MealHandler.protein)
 async def get_protein(message: types.Message, state: FSMContext):
-    protein = message.text
+    protein = float(message.text)
     await state.update_data(
        {"protein": protein}
     )
@@ -73,7 +73,7 @@ async def get_protein(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=MealHandler.fat)
 async def get_fat(message: types.Message, state: FSMContext):
-    fat = message.text
+    fat = float(message.text)
     await state.update_data(
        {"fat": fat}
     )
@@ -89,23 +89,26 @@ async def get_food(message: types.Message, state: FSMContext):
         )
 
     else:  
+        # TODO
+        # Validation input
         food = [i for i in message.text.split(",")]
         await state.update_data(
             {"food": food}
         )
 
+    # Add meal to the report
     data = await state.get_data()
     meal = Meal.parse_meal(data)
-    report.add_meal(meal)
+    output_message = report.add_meal(meal)
 
-    await message.answer("Amazing! All data has been added!")
+    await message.answer(output_message)
     await state.finish()
 
-# @dp.message_handler(state=MealHandler.photo)
-# async def get_data(message: types.Message, state: FSMContext):
-#     data = await state.get_data()
-#     print(data)
-#     await state.finish()
+# GENERATE REPORT
+@dp.message_handler(commands=["getreport"])
+async def get_report(message: types.Message):
+    generated_report = report.generate_report()
+    await message.answer(generated_report)
 
 if __name__ == "__main__":
     executor.start_polling(dp, skip_updates=True)

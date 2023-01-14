@@ -3,7 +3,11 @@ from typing import Dict
 
 class Report:
     def __init__(self) -> None:
-        self._meals = Dict[str, Meal] # { Breakfast: (Meal(...)), Lunch: Meal(...), Dinner: ...}
+        self.__meals: Dict[str, Meal] = dict() # { Breakfast: (Meal(...)), Lunch: Meal(...), Dinner: ...}
+        self.__total_calories: float = 0
+        self.__total_carbs: float = 0
+        self.__total_protein: float = 0
+        self.__total_fat: float = 0
 
     def add_meal(self, meal: Meal) -> str:
         """
@@ -16,17 +20,15 @@ class Report:
             message (str): output message
         """
 
-        meal_id = meal["meal_id"]
+        meal_id = meal.get_meal_id()
 
-        if meal.is_valid():
-            self.meals[meal_id] = meal
+        if meal.is_valid(list(self.__meals.keys())):
+            self.__meals[meal_id] = meal
             return "Meal has been successfully added"
-
-        self.meals[meal_id] = meal
         
-        return "There was a problem adding your meal. Make sure all the data is correct"
+        return "There was a problem adding your meal. Try again and make sure all the data is correct"
 
-    def edit_meal(self, meal_id: str) -> str:
+    def edit_meal(self, meal_id: int) -> str:
         """
         Edits a meal in the report
         -------------------------
@@ -38,7 +40,7 @@ class Report:
         """
         pass
 
-    def remove_meal(self, meal_id: str) -> str:
+    def remove_meal(self, meal_id: int) -> str:
         """
         Removes a meal to the report
         -------------------------
@@ -58,15 +60,43 @@ class Report:
             message (str): output message
         """
 
-        self.meals.clear()
+        self.__meals.clear()
 
         return "The report has been successfully cleared!"
+
+    def __calculate_totals(self) -> None:
+        """
+        Updates the total calories, carbs, protein, fat in the report
+        """
+
+        for meal in self.__meals.values():
+            _, calories, carbs, protein, fat = meal.get_all_data()
+
+            self.__total_calories += calories
+            self.__total_carbs += carbs
+            self.__total_protein += protein
+            self.__total_fat += fat
 
     def generate_report(self) -> str:
         """
         Generates a report 
-        -------------------------
+        
         Returns:
             report (str): output report
         """
-        pass
+
+        self.__calculate_totals()
+        report = f"-------------------------\nTotal calories: {self.__total_calories}\nTotal carbs: {self.__total_carbs}\nTotal protein: {self.__total_protein}\nTotal fat: {self.__total_fat}"
+
+        for meal in self.__meals.values():
+            meal_name, calories, carbs, protein, fat = meal.get_all_data()
+
+            report += "\n-------------------------"
+            report += f"\n{meal_name}:"
+            report += f"\nCalories: {calories}"
+            report += f"\nCarbs: {carbs}"
+            report += f"\nProtein: {protein}"
+            report += f"\nFat: {fat}"
+
+        return report 
+

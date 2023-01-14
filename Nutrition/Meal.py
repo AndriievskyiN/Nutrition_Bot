@@ -1,17 +1,18 @@
-from typing import List, Optional, Sequence, Dict, Any
+from typing import List, Optional, Sequence, Dict, Any, Tuple
 
 class Meal:
-    def __init__(self, meal_id: str, calories: float, carbs: float, protein: float, fat: float, food: Optional[List[str]] = [], photo: Optional[Sequence[float]] = []):
-        self._meal_id = meal_id
-        self._calories = calories
-        self._carbs = carbs
-        self._protein = protein
-        self._fat = fat
-        self._food = food
-        self._photo = photo
+    def __init__(self, meal_id: str, meal_name: str, calories: float, carbs: float, protein: float, fat: float, food: Optional[List[str]] = [], photo: Optional[Sequence[float]] = []):
+        self.__meal_id = meal_id
+        self.__meal_name = meal_name
+        self.__calories = calories
+        self.__carbs = carbs
+        self.__protein = protein
+        self.__fat = fat
+        self.__food = food
+        self.__photo = photo
     
-    @staticmethod
-    def parse_meal(data: Dict[str, Any]) -> str:
+    @classmethod
+    def parse_meal(cls, data: Dict[str, Any]):
         """
         Parses a dictionary of user responses
         -------------------------
@@ -21,21 +22,50 @@ class Meal:
         Returns:
             message (str): output message
         """
-        
-        meal_id = data["meal_id"]
+
+        meal_id = data["meal_id"] 
+        meal_name = cls.__parse_meal_name(meal_id)
         calories = data["calories"]
         carbs = data["carbs"]
         protein = data["protein"]
         fat = data["fat"]
         food = data["food"]
 
-        return Meal(meal_id, calories, carbs, protein, fat, food)
+        meal = cls(meal_id, meal_name, calories, carbs, protein, fat, food)
+        return meal
+    
+    def get_meal_id(self) -> str:
+        """
+        Returns the id of the meal
+        """
+        return self.__meal_id
 
-    def _is_valid(self) -> bool: 
+    @staticmethod
+    def __parse_meal_name(meal_id: int) -> str:
+        """
+        -------------------------
+        Parses the meal name from the meal id
+        -------------------------
+        Arguments:
+            meal_id (int): the id of the meal
+        -------------------------
+        Returns:
+            meal_name (str): meal name    
+        """
+
+        meal_number = meal_id + 1
+        meal_name = f"Meal {meal_number}"
+        
+        return meal_name
+
+    def get_all_data(self) -> Tuple[str, float, float, float, float]:
+        return self.__meal_name, self.__calories, self.__carbs, self.__protein, self.__fat
+
+    def is_valid(self, meals: List[str]) -> bool: 
         # 1. Check if calories, carbs, protein and fat > 0
         # There are going to be more checks in the future
 
-        return self.calories > 0 and self.carbs > 0 and self.protein > 0 and self.fat > 0
+        return float(self.__calories) > 0 and float(self.__carbs) > 0 and float(self.__protein) > 0 and float(self.__fat) > 0 and self.__meal_id not in meals
 
     def add_food(self, food: List[str]) -> str:
         pass
