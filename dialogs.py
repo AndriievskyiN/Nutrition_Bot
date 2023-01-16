@@ -8,3 +8,4 @@ class MealHandler(StatesGroup):
     fat = State()
     food = State()
     photo = State()
+

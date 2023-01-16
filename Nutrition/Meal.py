@@ -33,6 +33,28 @@ class Meal:
 
         meal = cls(meal_id, meal_name, calories, carbs, protein, fat, food)
         return meal
+
+    def edit_meal(self, data: Dict[str, Any]):
+        """
+        Edits the meal
+        -------------------------
+        Arguments:
+            data (Dict[str, Any]): dictionary of new meal data
+        -------------------------
+        Returns:
+            meal (Meal): Meal object with edited data
+        """
+        
+        # self.__meal_id = data["meal_id"] if data["meal_id"] is not None else self.__meal_id
+        # # NOTE: MIGHT BLOW UP BECAUSE __parse_meal_name IS A STATIC METHOD
+        # self.__meal_name = self.__parse_meal_name(self.__meal_id)
+        self.__calories = data["calories"] if data["calories"] is not None else self.__calories
+        self.__carbs = data["carbs"] if data["carbs"] is not None else self.__carbs
+        self.__protein = data["protein"] if data["protein"] is not None else self.__protein
+        self.__fat = data["fat"] if data["fat"] is not None else self.__fat
+        self.__food = data["food"] if data["food"] is not None else self.__food
+
+        return self
     
     def get_meal_id(self) -> str:
         """
@@ -59,7 +81,7 @@ class Meal:
         return meal_name
 
     def get_all_data(self) -> Tuple[str, float, float, float, float]:
-        return self.__meal_name, self.__calories, self.__carbs, self.__protein, self.__fat
+        return self.__meal_name, self.__calories, self.__carbs, self.__protein, self.__fat, self.__food
 
     def is_valid(self, meals: List[str]) -> bool: 
         # 1. Check if calories, carbs, protein and fat > 0
@@ -72,3 +94,7 @@ class Meal:
 
     def add_photo(self, photo: Sequence[float]) -> str: 
         pass
+
+    def __repr__(self):
+        return f"Meal({self.__meal_id}, {self.__calories}, {self.__carbs}, {self.__protein}, {self.__fat})"
+

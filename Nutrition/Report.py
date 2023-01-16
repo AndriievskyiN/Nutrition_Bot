@@ -1,9 +1,9 @@
 from Nutrition.Meal import Meal
-from typing import Dict
+from typing import Dict, Any
 
 class Report:
     def __init__(self) -> None:
-        self.__meals: Dict[str, Meal] = dict() # { Breakfast: (Meal(...)), Lunch: Meal(...), Dinner: ...}
+        self.__meals: Dict[int, Meal] = dict() # { Breakfast: (Meal(...)), Lunch: Meal(...), Dinner: ...}
         self.__total_calories: float = 0
         self.__total_carbs: float = 0
         self.__total_protein: float = 0
@@ -28,17 +28,20 @@ class Report:
         
         return "There was a problem adding your meal. Try again and make sure all the data is correct"
 
-    def edit_meal(self, meal_id: int) -> str:
+    def edit_meal(self, meal_id: int, data: Dict[str, Any]) -> str:
         """
         Edits a meal in the report
         -------------------------
         Arguments:
             meal_id (str): The id of the meal to edit
+            data (Dict[str, Any]): New data to be set
         -------------------------
         Returns:
             message (str): output message
         """
-        pass
+        
+        self.__meals[meal_id] = self.__meals[meal_id].edit_meal(data)
+        return "Meal has been sucessfully edited!"
 
     def remove_meal(self, meal_id: int) -> str:
         """
@@ -64,13 +67,24 @@ class Report:
 
         return "The report has been successfully cleared!"
 
+
+    def get_meal(self, meal_id: int) -> Meal:
+        """
+        Returns a Meal object from the dictionary of meals
+        -------------------------
+        Arguments:
+            meal_id (int): id of the meal to return
+        """
+
+        return self.__meals[meal_id]
+
     def __calculate_totals(self) -> None:
         """
         Updates the total calories, carbs, protein, fat in the report
         """
 
         for meal in self.__meals.values():
-            _, calories, carbs, protein, fat = meal.get_all_data()
+            _, calories, carbs, protein, fat, _ = meal.get_all_data()
 
             self.__total_calories += calories
             self.__total_carbs += carbs
@@ -89,7 +103,8 @@ class Report:
         report = f"-------------------------\nTotal calories: {self.__total_calories}\nTotal carbs: {self.__total_carbs}\nTotal protein: {self.__total_protein}\nTotal fat: {self.__total_fat}"
 
         for meal in self.__meals.values():
-            meal_name, calories, carbs, protein, fat = meal.get_all_data()
+            meal_name, calories, carbs, protein, fat, food = meal.get_all_data()
+            food = ", ".join(food) if food is not None else ""
 
             report += "\n-------------------------"
             report += f"\n{meal_name}:"
@@ -97,6 +112,7 @@ class Report:
             report += f"\nCarbs: {carbs}"
             report += f"\nProtein: {protein}"
             report += f"\nFat: {fat}"
+            report += f"\nFood: {food}"
 
         return report 
 
