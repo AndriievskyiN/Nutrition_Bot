@@ -1,7 +1,7 @@
 from typing import List, Optional, Sequence, Dict, Any, Tuple
 
 class Meal:
-    def __init__(self, meal_id: str, meal_name: str, calories: float, carbs: float, protein: float, fat: float, food: Optional[List[str]] = [], photo: Optional[Sequence[float]] = []):
+    def __init__(self, meal_id: int, meal_name: str, calories: float, carbs: float, protein: float, fat: float, food: Optional[List[str]] = [], photo: Optional[Sequence[float]] = []):
         self.__meal_id = meal_id
         self.__meal_name = meal_name
         self.__calories = calories
@@ -25,10 +25,10 @@ class Meal:
 
         meal_id = data["meal_id"] 
         meal_name = cls.__parse_meal_name(meal_id)
-        calories = data["calories"]
-        carbs = data["carbs"]
-        protein = data["protein"]
-        fat = data["fat"]
+        calories = float(data["calories"])
+        carbs = float(data["carbs"])
+        protein = float(data["protein"])
+        fat = float(data["fat"])
         food = data["food"]
 
         meal = cls(meal_id, meal_name, calories, carbs, protein, fat, food)
@@ -48,15 +48,16 @@ class Meal:
         # self.__meal_id = data["meal_id"] if data["meal_id"] is not None else self.__meal_id
         # # NOTE: MIGHT BLOW UP BECAUSE __parse_meal_name IS A STATIC METHOD
         # self.__meal_name = self.__parse_meal_name(self.__meal_id)
-        self.__calories = data["calories"] if data["calories"] is not None else self.__calories
-        self.__carbs = data["carbs"] if data["carbs"] is not None else self.__carbs
-        self.__protein = data["protein"] if data["protein"] is not None else self.__protein
-        self.__fat = data["fat"] if data["fat"] is not None else self.__fat
-        self.__food = data["food"] if data["food"] is not None else self.__food
+
+        self.__calories = float(data["calories"]) if not data["calories"].startswith("pass") else self.__calories
+        self.__carbs = float(data["carbs"]) if not data["carbs"].startswith("pass") else self.__carbs
+        self.__protein = float(data["protein"]) if not data["protein"].startswith("pass") else self.__protein
+        self.__fat = float(data["fat"]) if not data["fat"].startswith("pass") else self.__fat
+        self.__food = data["food"] if not data["food"].startswith("pass") else self.__food
 
         return self
     
-    def get_meal_id(self) -> str:
+    def get_meal_id(self) -> int:
         """
         Returns the id of the meal
         """

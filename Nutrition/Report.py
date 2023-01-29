@@ -78,6 +78,16 @@ class Report:
 
         return self.__meals[meal_id]
 
+    def __reset_totals(self) -> None:
+        """
+        Resets totals so that when generating a report, the totals aren't accumulated twice
+        """
+
+        self.__total_calories = 0
+        self.__total_carbs = 0
+        self.__total_protein = 0
+        self.__total_fat = 0
+
     def __calculate_totals(self) -> None:
         """
         Updates the total calories, carbs, protein, fat in the report
@@ -91,6 +101,13 @@ class Report:
             self.__total_protein += protein
             self.__total_fat += fat
 
+    def __sort_meals(self) -> None:
+        """
+        Sorts the meals dictionary by the meal_id
+        """
+
+        self.__meals = sorted(self.__meals.items(), key = lambda x: x[0])
+
     def generate_report(self) -> str:
         """
         Generates a report 
@@ -99,12 +116,17 @@ class Report:
             report (str): output report
         """
 
+        self.__reset_totals()
         self.__calculate_totals()
+
+        # Sort the meals dictionary by meal_id
+        self.__sort_meals()
+
         report = f"-------------------------\nTotal calories: {self.__total_calories}\nTotal carbs: {self.__total_carbs}\nTotal protein: {self.__total_protein}\nTotal fat: {self.__total_fat}"
 
         for meal in self.__meals.values():
             meal_name, calories, carbs, protein, fat, food = meal.get_all_data()
-            food = ", ".join(food) if food is not None else ""
+            food = ", ".join(food) if not food.startswith("pass") else ""
 
             report += "\n-------------------------"
             report += f"\n{meal_name}:"

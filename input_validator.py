@@ -1,11 +1,8 @@
-from typing import Any
+from typing import Any, Union
 
 class InputValidator:
-    def __init__(self):
-        pass
-
     @staticmethod
-    def validate_type(value: Any, type: type) -> bool:
+    def __is_valid_type(value: Any, type: type) -> bool:
         """
         Checks if the type of a value is what it is supposed to be
         -------------------------
@@ -18,5 +15,17 @@ class InputValidator:
         """
         return isinstance(value, type)
 
+    @staticmethod
+    def is_valid_number(value: str, command: str): # edit
+        if value.startswith("pass") and command == "/editmeal":
+            return True
 
-    
+        elif value.startswith("pass") and command == "/addmeal":
+            return False
+
+        try:
+            float(value)
+            return True
+
+        except ValueError:
+            return False
