@@ -106,7 +106,7 @@ class Report:
         Sorts the meals dictionary by the meal_id
         """
 
-        self.__meals = sorted(self.__meals.items(), key = lambda x: x[0])
+        self.__meals = dict(sorted(self.__meals.items(), key = lambda x: x[0]))
 
     def generate_report(self) -> str:
         """

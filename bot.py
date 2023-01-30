@@ -162,7 +162,7 @@ async def get_food(message: types.Message, state: FSMContext):
 
     if command == "/addmeal":
         # Add meal to the report
-        meal = Meal.parse_meal(data)
+        meal = Meal. parse_meal(data)
         output_message = report.add_meal(meal)
 
     elif command == "/editmeal":
