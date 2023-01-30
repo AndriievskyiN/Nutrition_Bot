@@ -9,3 +9,6 @@ class MealHandler(StatesGroup):
     food = State()
     photo = State()
 
+class FoodAdder(StatesGroup):
+    meal_id = State()
+    food = State()

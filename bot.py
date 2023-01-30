@@ -6,7 +6,7 @@ from helper_scripts.hidden import TOKEN
 from Nutrition.Meal import Meal
 from Nutrition.Report import Report
 from helper_scripts.InlineKeyboards import Keyboard
-from dialogs import MealHandler
+from dialogs import MealHandler, FoodAdder
 from input_validator import InputValidator
 
 # Setting up the bot
@@ -17,6 +17,9 @@ dp = Dispatcher(bot, storage=storage)
 # Initialize the report
 report = Report()
 
+# Keyboards
+meal_id_keyboard = Keyboard.meal_id_keyboard()
+
 # START COMMAND
 @dp.message_handler(commands=["start"])
 async def welcome(message: types.Message):
@@ -25,9 +28,7 @@ async def welcome(message: types.Message):
 # ADD MEAL
 @dp.message_handler(commands=["addmeal", "editmeal"])
 async def add_meal(message: types.Message, state: FSMContext):
-    keyboard = Keyboard.meal_id_keyboard()
-
-    await message.answer("Choose the meal", reply_markup=keyboard)
+    await message.answer("Choose the meal", reply_markup=meal_id_keyboard)
     await state.update_data(
        {"command": message.text}
     )   
@@ -162,7 +163,7 @@ async def get_fat(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=MealHandler.food)
 async def get_food(message: types.Message, state: FSMContext):
-    food = message.text if message.text.lower().startswith("pass") else [i for i in message.text.split(",")]
+    food = [] if message.text.lower().startswith("pass") else [i for i in message.text.split(",")]
     await state.update_data(
         {"food": food}
     )
@@ -173,7 +174,7 @@ async def get_food(message: types.Message, state: FSMContext):
 
     if command == "/addmeal":
         # Add meal to the report
-        meal = Meal. parse_meal(data)
+        meal = Meal.parse_meal(data)
         output_message = report.add_meal(meal)
 
     elif command == "/editmeal":
@@ -187,8 +188,7 @@ async def get_food(message: types.Message, state: FSMContext):
 # REMOVE A MEAL
 @dp.message_handler(commands=["removemeal"])
 async def remove_meal_prompt(message: types.Message):
-    keyboard = Keyboard.meal_id_keyboard()
-    await message.answer("What meal do you want to remove?", reply_markup=keyboard)
+    await message.answer("What meal do you want to remove?", reply_markup=meal_id_keyboard)
 
 @dp.callback_query_handler(text=[i for i in range(4)])
 async def remove_meal(call: types.CallbackQuery):
@@ -201,7 +201,38 @@ async def remove_meal(call: types.CallbackQuery):
     else:
         output_message = "This meal cannot be removed since it does not exist"
 
-    await call.message.answer(output_message)    
+    await call.message.answer(output_message)   
+
+# ADD FOOD
+@dp.message_handler(commands=["addfood"])
+async def add_food_prompt(message: types.Message, state: FSMContext):
+    await message.answer("What meal do you want to add food to?", reply_markup=meal_id_keyboard)
+    await FoodAdder.meal_id.set()
+    
+@dp.callback_query_handler(text=[i for i in range(4)], state=FoodAdder.meal_id)
+async def get_food_meal_id(call: types.CallbackQuery, state=FSMContext):
+    await call.message.delete()
+
+    meal_id = int(call.data)
+    await state.update_data(
+        {"meal_id": meal_id}
+    )
+
+    await call.message.answer("List the food that you want to add each item separated by a comma \nType \"pass\" to skip")
+    await FoodAdder.next()
+
+@dp.message_handler(state=FoodAdder.food)
+async def add_food(message: types.Message, state=FSMContext):
+    food = [] if message.text.lower().startswith("pass") else [i for i in message.text.split(",")]
+
+    data = await state.get_data()
+    meal_id = data["meal_id"]
+
+    # add food to the report
+    output_message = report.add_food(meal_id, food)
+
+    await message.answer(output_message)
+    await state.finish()
 
 # GENERATE REPORT
 @dp.message_handler(commands=["getreport"])

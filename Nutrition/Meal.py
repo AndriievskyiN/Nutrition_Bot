@@ -53,7 +53,8 @@ class Meal:
         self.__carbs = float(data["carbs"]) if not data["carbs"].lower().startswith("pass") else self.__carbs
         self.__protein = float(data["protein"]) if not data["protein"].lower().startswith("pass") else self.__protein
         self.__fat = float(data["fat"]) if not data["fat"].lower().startswith("pass") else self.__fat
-        self.__food = data["food"] if not data["food"].lower().startswith("pass") else self.__food
+        #self.__food = data["food"] if not data["food"].lower().startswith("pass") else self.__food
+        self.__food = data["food"]
 
         return self
     
@@ -90,8 +91,10 @@ class Meal:
 
         return float(self.__calories) > 0 and float(self.__carbs) > 0 and float(self.__protein) > 0 and float(self.__fat) > 0 and self.__meal_id not in meals
 
-    def add_food(self, food: List[str]) -> str:
-        pass
+    def add_food(self, food: List[str]):
+        self.__food += food
+        return self
+
 
     def add_photo(self, photo: Sequence[float]) -> str: 
         pass

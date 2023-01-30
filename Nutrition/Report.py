@@ -1,5 +1,5 @@
 from Nutrition.Meal import Meal
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 class Report:
     def __init__(self) -> None:
@@ -48,7 +48,7 @@ class Report:
         Removes a meal to the report
         -------------------------
         Arguments:
-            meal_id (str): The id of the meal to remove
+            meal_id (int): The id of the meal to remove
         -------------------------
         Returns:
             message (str): output message
@@ -56,6 +56,19 @@ class Report:
         
         del self.__meals[meal_id]
         return "Meal has been successfully removed"
+
+
+    def add_food(self, meal_id: int, food: List[str]) -> str:
+        """
+        Adds food to a meal
+        -------------------------
+        Arguments:
+            meal_id (int): The id of the meal to add food to
+            food (List[str]): pieces of food that were consumed
+        """
+
+        self.__meals[meal_id] = self.__meals[meal_id].add_food(food)
+        return "Food has been successfully added"
 
     def clear_report(self) -> str:
         """
@@ -141,7 +154,7 @@ class Report:
 
         for meal in self.__meals.values():
             meal_name, calories, carbs, protein, fat, food = meal.get_all_data()
-            food = ", ".join(food) if not food.lower().startswith("pass") else ""
+            food = ", ".join(food)
 
             report += "\n-------------------------"
             report += f"\n{meal_name}:"
