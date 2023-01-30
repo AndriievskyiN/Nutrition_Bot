@@ -172,6 +172,21 @@ async def get_food(message: types.Message, state: FSMContext):
     await message.answer(output_message)
     await state.finish()
 
+
+# REMOVE A MEAL
+@dp.message_handler(commands=["removemeal"])
+async def remove_meal_prompt(message: types.Message):
+    keyboard = Keyboard.meal_id_keyboard()
+    await message.answer("What meal do you want to remove?", reply_markup=keyboard)
+
+@dp.callback_query_handler(text=[i for i in range(4)])
+async def remove_meal(call: types.CallbackQuery):
+    await call.message.delete()
+    meal_id = int(call.data)
+
+    output_message = report.remove_meal(meal_id)
+    await call.message.answer(output_message)
+
 # GENERATE REPORT
 @dp.message_handler(commands=["getreport"])
 async def get_report(message: types.Message):

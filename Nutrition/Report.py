@@ -53,7 +53,9 @@ class Report:
         Returns:
             message (str): output message
         """
-        pass
+        
+        del self.__meals[meal_id]
+        return "Meal has been successfully removed"
 
     def clear_report(self) -> str:
         """
