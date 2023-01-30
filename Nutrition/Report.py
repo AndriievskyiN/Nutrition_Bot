@@ -80,6 +80,19 @@ class Report:
 
         return self.__meals[meal_id]
 
+    def meal_exists(self, meal_id: int) -> bool:
+        """
+        Checks if a meal exists or not
+        -------------------------
+        Arguments:
+            meal_id (int): id of the meal to check for
+        -------------------------
+        Returns:
+            bool: True if the meal exists, and false otherwise
+        """
+
+        return meal_id in self.__meals
+
     def __reset_totals(self) -> None:
         """
         Resets totals so that when generating a report, the totals aren't accumulated twice
@@ -128,7 +141,7 @@ class Report:
 
         for meal in self.__meals.values():
             meal_name, calories, carbs, protein, fat, food = meal.get_all_data()
-            food = ", ".join(food) if not food.startswith("pass") else ""
+            food = ", ".join(food) if not food.lower().startswith("pass") else ""
 
             report += "\n-------------------------"
             report += f"\n{meal_name}:"

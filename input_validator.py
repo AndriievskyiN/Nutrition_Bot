@@ -17,10 +17,10 @@ class InputValidator:
 
     @staticmethod
     def is_valid_number(value: str, command: str): # edit
-        if value.startswith("pass") and command == "/editmeal":
+        if value.lower().startswith("pass") and command == "/editmeal":
             return True
 
-        elif value.startswith("pass") and command == "/addmeal":
+        elif value.lower().startswith("pass") and command == "/addmeal":
             return False
 
         try:

@@ -1,6 +1,6 @@
-a = {2: "a", 1: "b"}
+a = {"a": 1, "b": 2}
 
+def foo(arg: str):
+    return arg in a
 
-print(a)
-del a[1]
-print(a)
+print(foo("a"))

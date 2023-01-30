@@ -48,10 +48,21 @@ async def get_meal_id(call: types.CallbackQuery, state: FSMContext):
 
 
     if command == "/addmeal":
-        await call.message.answer("Great! What is the amount of calories you have eaten?")
+        if report.meal_exists(meal_id):
+            await call.message.answer("This meal already exists.")
+            await state.finish()
+        else:
+            await call.message.answer("Great! What is the amount of calories you have consumed?")
     
     elif command == "/editmeal":
-        await call.message.answer("What is the new amount of calories you have eaten? \nType \"pass\" not to change it")
+        if not report.meal_exists(meal_id):
+            await call.message.answer("WARNING: This meal cannot be edited since it was not added first. Will add it instead of editing. \n\n What is the amount of calories you have consumed? ")
+            await state.update_data(
+                {"command": "/addmeal"}
+            )
+
+        else:
+            await call.message.answer("What is the new amount of calories you have consumed? \nType \"pass\" not to change it")
 
     await MealHandler.next()
 
@@ -74,7 +85,7 @@ async def get_calories(message: types.Message, state: FSMContext):
         )
 
         if command == "/addmeal":
-            await message.answer("Great! What is the amount of carbs you have eaten?")
+            await message.answer("Great! What is the amount of carbs you have consumed?")
 
         elif command == "/editmeal":
             await message.answer("What is the new amount of carbs you have consumed? \nType \"pass\" not to change it")
@@ -98,7 +109,7 @@ async def get_carbs(message: types.Message, state: FSMContext):
         )
 
         if command == "/addmeal":
-            await message.answer("Great! What is the amount of protein you have eaten?")
+            await message.answer("Great! What is the amount of protein you have consumed?")
 
         elif command == "/editmeal":
             await message.answer("What is the new amount of protein you have consumed? \nType \"pass\" not to change it")
@@ -121,7 +132,7 @@ async def get_protein(message: types.Message, state: FSMContext):
         )
 
         if command == "/addmeal":
-            await message.answer("Great! What is the amount of fat you have eaten?")
+            await message.answer("Great! What is the amount of fat you have consumed?")
         
         elif command == "/editmeal":
             await message.answer("What is the new amount of fat you have consumed? \nType \"pass\" not to change it")
@@ -144,14 +155,14 @@ async def get_fat(message: types.Message, state: FSMContext):
         )
 
         if command == "/addmeal":
-            await message.answer("Lastly, what food have you eaten? \nType each food item seperated by a comma (e.g. rice, chicken, salad) \nType \"pass\" to skip this part")
+            await message.answer("Lastly, what food have you consumed? \nType each food item seperated by a comma (e.g. rice, chicken, salad) \nType \"pass\" to skip this part")
         elif command == "/editmeal":
             await message.answer("Lastly, what new food have you consumed? \nType each food item seperated by a comma (e.g. rice, chicken, salad) \nType \"pass\" not to change it")
         await MealHandler.next()
 
 @dp.message_handler(state=MealHandler.food)
 async def get_food(message: types.Message, state: FSMContext):
-    food = message.text if message.text.startswith("pass") else [i for i in message.text.split(",")]
+    food = message.text if message.text.lower().startswith("pass") else [i for i in message.text.split(",")]
     await state.update_data(
         {"food": food}
     )
@@ -184,8 +195,13 @@ async def remove_meal(call: types.CallbackQuery):
     await call.message.delete()
     meal_id = int(call.data)
 
-    output_message = report.remove_meal(meal_id)
-    await call.message.answer(output_message)
+    if report.meal_exists(meal_id):
+        output_message = report.remove_meal(meal_id)
+
+    else:
+        output_message = "This meal cannot be removed since it does not exist"
+
+    await call.message.answer(output_message)    
 
 # GENERATE REPORT
 @dp.message_handler(commands=["getreport"])

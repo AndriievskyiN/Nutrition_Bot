@@ -49,11 +49,11 @@ class Meal:
         # # NOTE: MIGHT BLOW UP BECAUSE __parse_meal_name IS A STATIC METHOD
         # self.__meal_name = self.__parse_meal_name(self.__meal_id)
 
-        self.__calories = float(data["calories"]) if not data["calories"].startswith("pass") else self.__calories
-        self.__carbs = float(data["carbs"]) if not data["carbs"].startswith("pass") else self.__carbs
-        self.__protein = float(data["protein"]) if not data["protein"].startswith("pass") else self.__protein
-        self.__fat = float(data["fat"]) if not data["fat"].startswith("pass") else self.__fat
-        self.__food = data["food"] if not data["food"].startswith("pass") else self.__food
+        self.__calories = float(data["calories"]) if not data["calories"].lower().startswith("pass") else self.__calories
+        self.__carbs = float(data["carbs"]) if not data["carbs"].lower().startswith("pass") else self.__carbs
+        self.__protein = float(data["protein"]) if not data["protein"].lower().startswith("pass") else self.__protein
+        self.__fat = float(data["fat"]) if not data["fat"].lower().startswith("pass") else self.__fat
+        self.__food = data["food"] if not data["food"].lower().startswith("pass") else self.__food
 
         return self
     
