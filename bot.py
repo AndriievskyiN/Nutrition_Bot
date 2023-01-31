@@ -212,14 +212,19 @@ async def add_food_prompt(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(text=[i for i in range(4)], state=FoodAdder.meal_id)
 async def get_food_meal_id(call: types.CallbackQuery, state=FSMContext):
     await call.message.delete()
-
     meal_id = int(call.data)
-    await state.update_data(
-        {"meal_id": meal_id}
-    )
 
-    await call.message.answer("List the food that you want to add each item separated by a comma \nType \"pass\" to skip")
-    await FoodAdder.next()
+    if not report.meal_exists(meal_id):
+        await call.message.answer("Cannot add food to this meal since it does not exist")
+        await state.finish()
+
+    else:
+        await state.update_data(
+            {"meal_id": meal_id}
+        )
+
+        await call.message.answer("List the food that you want to add each item separated by a comma \nType \"pass\" to skip")
+        await FoodAdder.next()
 
 @dp.message_handler(state=FoodAdder.food)
 async def add_food(message: types.Message, state=FSMContext):
